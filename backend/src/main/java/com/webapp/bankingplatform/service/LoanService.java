@@ -2,6 +2,7 @@ package com.webapp.bankingplatform.service;
 
 import com.webapp.bankingplatform.dto.LoanApplicationRequest;
 import com.webapp.bankingplatform.dto.LoanPaymentRequest;
+import com.webapp.bankingplatform.dto.LoanPaymentResponse;
 import com.webapp.bankingplatform.dto.LoanResponse;
 import com.webapp.bankingplatform.entity.Loan;
 import com.webapp.bankingplatform.entity.LoanPayment;

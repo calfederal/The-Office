@@ -1,0 +1,58 @@
+<div class="deposit-container">
+  <nav class="navbar">
+    <div class="nav-brand">
+      <h1>Banking Portal</h1>
+    </div>
+    <div class="nav-user">
+      <span class="user-name">{{ authService.currentUser?.name }}</span>
+      <button class="logout-btn" (click)="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="deposit-content">
+    <div class="back-btn" (click)="navigateTo('dashboard')">
+      ← Back to Dashboard
+    </div>
+
+    <div class="deposit-box">
+      <h2>Deposit Funds</h2>
+      <p class="deposit-instruction">Add funds to your account</p>
+
+      <form [formGroup]="depositForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="amount">Amount ($)</label>
+          <input type="number" id="amount" formControlName="amount" placeholder="Enter amount" class="form-input">
+          <div *ngIf="depositForm.get('amount')?.invalid && depositForm.get('amount')?.touched" class="error">
+            Amount is required and must be at least $1
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="reference">Reference Number</label>
+          <input type="text" id="reference" formControlName="reference" placeholder="Enter reference number" class="form-input">
+          <div *ngIf="depositForm.get('reference')?.invalid && depositForm.get('reference')?.touched" class="error">
+            Reference number is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Deposit Method</label>
+          <select class="form-select">
+            <option value="bank">Bank Transfer</option>
+            <option value="cash">Cash Deposit</option>
+            <option value="check">Check Deposit</option>
+          </select>
+        </div>
+
+        <button type="submit" class="submit-btn" [disabled]="depositForm.invalid || loading">
+          {{ loading ? 'Processing...' : 'Deposit Funds' }}
+        </button>
+      </form>
+
+      <div *ngIf="error" class="error-message">{{ error }}</div>
+      <div *ngIf="success" class="success-message">
+        Deposit successful!
+      </div>
+    </div>
+  </div>
+</div>
