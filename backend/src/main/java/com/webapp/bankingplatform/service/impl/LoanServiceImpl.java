@@ -25,6 +25,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class LoanServiceImpl implements LoanService {
@@ -160,9 +161,8 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     @Transactional(readOnly = true)
-    public LoanResponse getLoan(Long loanId) {
-        Loan loan = loanRepository.findById(loanId)
-                .orElseThrow(() -> new BankingException("Loan not found"));
+    public LoanResponse getLoan(Long loanId, Long userId) {
+        Loan loan = findLoanForUser(loanId, userId);
         return LoanResponse.from(loan);
     }
 
@@ -180,9 +180,8 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     @Transactional
-    public LoanPaymentResponse makePayment(Long loanId, LoanPaymentRequest request) {
-        Loan loan = loanRepository.findById(loanId)
-                .orElseThrow(() -> new BankingException("Loan not found"));
+    public LoanPaymentResponse makePayment(Long loanId, LoanPaymentRequest request, Long userId) {
+        Loan loan = findLoanForUser(loanId, userId);
         if (loan.getStatus() != Loan.LoanStatus.ACTIVE) {
             throw new BankingException("Loan is not active");
         }
@@ -244,7 +243,8 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<LoanPaymentResponse> getSchedule(Long loanId) {
+    public List<LoanPaymentResponse> getSchedule(Long loanId, Long userId) {
+        findLoanForUser(loanId, userId);
         return loanPaymentRepository.findByLoanIdOrderByInstallmentNumberAsc(loanId).stream()
                 .map(LoanPaymentResponse::from)
                 .toList();
@@ -269,6 +269,15 @@ public class LoanServiceImpl implements LoanService {
     private String generateLoanNumber() {
         long seq = loanRepository.maxId() + 1;
         return "LN" + String.format("%010d", seq);
+    }
+
+    private Loan findLoanForUser(Long loanId, Long userId) {
+        Loan loan = loanRepository.findById(loanId)
+                .orElseThrow(() -> new BankingException("Loan not found"));
+        if (loan.getUser() == null || !Objects.equals(loan.getUser().getId(), userId)) {
+            throw new BankingException("Loan not found");
+        }
+        return loan;
     }
 
     private String gradeRisk(Integer creditScore) {

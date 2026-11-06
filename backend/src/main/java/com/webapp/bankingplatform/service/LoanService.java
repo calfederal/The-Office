@@ -21,15 +21,15 @@ public interface LoanService {
 
     LoanResponse disburseLoan(Long loanId);
 
-    LoanResponse getLoan(Long loanId);
+    LoanResponse getLoan(Long loanId, Long userId);
 
     Page<LoanResponse> listMyLoans(Long userId, Pageable pageable);
 
     Page<LoanResponse> listLoansByStatus(Loan.LoanStatus status, Pageable pageable);
 
-    LoanPaymentResponse makePayment(Long loanId, LoanPaymentRequest request);
+    LoanPaymentResponse makePayment(Long loanId, LoanPaymentRequest request, Long userId);
 
-    List<LoanPaymentResponse> getSchedule(Long loanId);
+    List<LoanPaymentResponse> getSchedule(Long loanId, Long userId);
 
     int markOverduePayments();
 }
